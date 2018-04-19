@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<!-- datepicker here -->
+<link href='dist/rome.css' rel='stylesheet' type='text/css' />
+<link href='example/example.css' rel='stylesheet' type='text/css' />
+
+<script src="js/jquery-1.9.1.min.js"></script>
+	<link rel="stylesheet"  href="css/bootstrap.min.css">
+	<link rel="stylesheet"  href="css/justified-nav.css">
+    <!-- <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <!-- <link href="http://getbootstrap.com/examples/justified-nav/justified-nav.css" rel="stylesheet"> -->
+<script src='dist/rome.js'></script>
+    <style>
+        .axis path {
+            fill: none;
+            stroke: #777;
+            shape-rendering: crispEdges;
+        }
+        .axis text {
+            font-family: Lato;
+            font-size: 13px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="jumbotron">
+
+
+
+
+  <div class='parent'>
+    <label for='dt'>請輸入Reader編號(多台以逗號隔開)</label>
+    <input id='reader_name' class='input'><br/><br/>
+    <label for='dt'>請選擇資料的時間範圍: </label>
+    <input id='dt' class='input'>
+	<input id='dt2' class='input'>
+	<button id='createbtn' type="button" class="btn btn-primary btn-sm">產生圖形</button>
+  </div>
+ 
+<!--             <svg id="area1" width="1000" height="500"></svg>
+			<svg id="area2" width="1000" height="500"></svg> -->
+            <!-- <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> -->
+			<script src="js/d3.v3.min.js"></script>
+            <script>
+                function InitChart(data,containerID) {
+                    /*var data = [{
+                        "strength": "10",
+                        "date": "2015-06-29 10:10:00"
+                    }, {
+                        "strength": "30",
+                        "date": "2015-06-29 10:15:00"
+                    }, {
+                        "strength": "50",
+                        "date": "2015-06-29 10:20:00"
+                    }, {
+                        "strength": "10",
+                        "date": "2015-06-29 10:25:00"
+                    }, {
+                        "strength": "10",
+                        "date": "2015-06-29 10:30:00"
+                    }, {
+                        "strength": "20",
+                        "date": "2015-06-29 10:35:00"
+                    }];*/
+					var data = data;
+					
+
+
+
+
+
+
+                    var vis = d3.select("#"+containerID),
+                        WIDTH = 1000,
+                        HEIGHT = 500,
+                        MARGINS = {
+                            top: 20,
+                            right: 20,
+                            bottom: 20,
+                            left: 50
+                        },
+
+                        //xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([2000, 2010]),
+						xScale = d3.time.scale()
+						.domain([new Date(data[0].date), d3.time.minute.offset(new Date(data[data.length - 1].date), 0)])
+						.rangeRound([MARGINS.left, WIDTH - MARGINS.right]);	
+                        yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0, 80]),
+
+                        xAxis = d3.svg.axis()
+                        .scale(xScale),
+
+                        yAxis = d3.svg.axis()
+                        .scale(yScale)
+                        .orient("left");
+
+
+
+                    
+
+                    vis.append("svg:g")
+                        .attr("class", "x axis")
+                        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+                        .call(xAxis);
+
+                    vis.append("svg:g")
+                        .attr("class", "y axis")
+                        .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+                        .call(yAxis);
+
+                    var lineGen = d3.svg.line()
+                        .x(function(d) {
+                            return xScale(new Date(d.date));
+                        })
+                        .y(function(d) {
+                            return yScale(d.strength);
+                        })
+                        .interpolate("basis");
+
+                    vis.append('svg:path')
+                        .attr('d', lineGen(data))
+                        .attr('stroke', 'green')
+                        .attr('stroke-width', 2)
+                        .attr('fill', 'none');
+
+
+
+
+
+
+                }
+					var data = [{
+                        "strength": "10",
+                        "date": "2015-06-29 10:10:00"
+                    }, {
+                        "strength": "30",
+                        "date": "2015-06-29 10:15:00"
+                    }, {
+                        "strength": "50",
+                        "date": "2015-06-29 10:20:00"
+                    }, {
+                        "strength": "10",
+                        "date": "2015-06-29 10:25:00"
+                    }, {
+                        "strength": "10",
+                        "date": "2015-06-29 10:30:00"
+                    }, {
+                        "strength": "20",
+                        "date": "2015-06-29 10:35:00"
+                    }];				
+                InitChart(data,"area1");
+				InitChart(data,"area2");
+				var moment = rome.moment;
+				var firstpick;
+				var secondpick;
+				
+				rome(dt).on('data', function (value) {
+						firstpick = value;
+						console.log("first:"+value);});	
+						
+				rome(dt2).on('data', function (value) {
+						console.log("second:"+value);
+						secondpick = value;
+						
+						});		
+			  
+				
+				$( "#createbtn" ).click(function() {
+					$('svg').remove();
+					$('.graphtitle').remove();
+					console.log("I do pressed the btn");
+					console.log("I do get reader_name:"+$('#reader_name').val());
+					var reader_name_field = $('#reader_name').val();
+					var readers = reader_name_field.split(",");
+					//console.log("readers:"+readers.length);
+					var protocol = location.protocol;
+					var hostname = location.hostname;
+					for(var i=0;i<readers.length;i++)
+					{
+						console.log("reader name:"+readers[i]);
+					$.ajax({
+						 type: "POST",
+						 url: protocol+"//"+hostname+":9004/2.4/v1/collecteddata",
+						 //url: "http://1.163.240.170:9004/2.4/v1/collecteddata",
+						 data:{reader_name:readers[i],start:firstpick,end:secondpick},
+					})
+					.success(function( msg ) {
+							//alert(JSON.stringify(msg));
+							
+							console.log("msg.reader_name:"+msg.reader_name);
+							console.log(JSON.stringify(msg));
+							
+							
+							
+							$('.parent').after("<svg id='reader"+msg.reader_name+"' width='1000' height='500'></svg><br/><br/>");
+							$('#reader'+msg.reader_name).after("<label class='graphtitle'>ReaderID:"+msg.reader_name+"</label>");
+							InitChart(msg.response,"reader"+msg.reader_name);
+					})
+					.fail(function(err) {
+							console.log("error:"+JSON.stringify(err));
+							alert(err.responseText);
+					})
+					.always(function() {
+							console.log("complete")
+					});					
+					
+					
+					}
+					//http://10.1.1.77:9004/2.4/v1/collecteddata?reader_name=10&&start=dddd&&end=pp
+					/*$.ajax({
+						 type: "POST",
+						 url: "http://10.1.1.77:9004/2.4/v1/collecteddata",
+						 data:{reader_name:"12",start:firstpick,end:secondpick},
+					})
+					.success(function( msg ) {
+							alert(JSON.stringify(msg));
+							
+							
+							$('body').append("<svg id='"+readers[i]+"' width='1000' height='500'></svg>");
+							InitChart(msg.response,readers[i]);
+					})
+					.fail(function(err) {
+							console.log("error:"+JSON.stringify(err));
+					})
+					.always(function() {
+							console.log("complete")
+					});*/ 
+				  
+				});					
+            </script>
+
+			
+        </div>
+
+    </div>
+
+</body>
+
+</html>
